@@ -8,14 +8,29 @@
   <p align="center">TESLO API.</p>
     
   1. Clonar proyecto
-  2. Realizar la instalacion de las depencias para el proyecto ```yarn install```
+  2. Realizar la instalacion de las depencias para el proyecto.
+        <p align="center">
+
+        ```
+        yarn install
+        ``` 
+        </p>
   3. Clonar el archivo ```.env.template``` y renombrarlo a ```.env```
   4. Cambiar las variables de entorno.
-  5. Levantar la base de datos mediante ```docker-compose up -d```
+  5. Levantar la base de datos mediante.
+        <p align="center">
+       
+        ```
+        docker-compose up -d
+        ```
+        </p>
+
+   
   6. Levantar en modo desarrollo 
-      <p align="center">
+        <p align="center">
       
-      ```
-      yarn start:dev
-      ```
-      </p>
+        ```
+        yarn start:dev
+        ```
+
+        </p>
