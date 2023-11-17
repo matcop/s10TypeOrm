@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ProductsModule } from './products/products.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommonModule } from './common/common.module';
 
 
 @Module({
@@ -18,7 +19,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true  // en produccion se tiene el valor de falso 
 
     }),
-    ProductsModule
+    ProductsModule,
+    CommonModule
   ],
 
 })

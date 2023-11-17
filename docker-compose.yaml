@@ -8,6 +8,7 @@ services:
     ports:
       - "5433:5432"
     environment:
+      POSTGRES_USER: 'root'
       DATABASE_HOST: '127.0.0.1'
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}

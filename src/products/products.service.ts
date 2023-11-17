@@ -3,9 +3,11 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
-import { NotFoundError, throwError } from 'rxjs';
+import { NotFoundError, of, throwError } from 'rxjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { error } from 'console';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { validate as isUUID } from 'uuid';
 
 @Injectable()
 export class ProductsService {
@@ -25,9 +27,9 @@ export class ProductsService {
       // //si no existe el slug tomara el titulo q es requerido remplazando espacios por _ y apostrofe por string vacio.
       // //pero si existiese igual validamos por que seran datos q colocara el usuario. el codigo lo usamos en product.entity
 
-      const product = this.productRepository.create(createProductDto); //creamos en memoria
+      const product = this.productRepository.create(createProductDto); //1.creamos en memoria
 
-      //y posteriormente se guardara en la  Base de datos.
+      //2.y posteriormente se guardara en la  Base de datos.
       await this.productRepository.save(product);
 
       return product;
@@ -37,39 +39,49 @@ export class ProductsService {
     }
   }
   //TODO:PAGINAR
-  findAll() {
+  findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
     try {
-      return this.productRepository.find({});
+      return this.productRepository.find({
+        take: limit,
+        skip: offset
+      });
+
     } catch (error) {
       console.log(error);
     }
   }
 
-  async findOne(id: string) {
 
+  async findOne(term: string) {
 
-    const product = await this.productRepository.findOneBy({ id });
+    let product: Product;
+
+    if (isUUID(term)) {
+      product = await this.productRepository.findOneBy({ id: term });
+    } else {
+      product = await this.productRepository.findOneBy({ slug: term });
+
+    }
+    // const product = await this.productRepository.findOneBy({ id });
     if (!product) {
-      throw new NotFoundException(`Product with ${id} not found`);
+      throw new NotFoundException(`Product with ${term} not found - producto no encontrado`);
     }
 
     return product;
-
-
-
-
-    // return `This action returns a #${id} product`;
   }
+
 
   update(id: number, updateProductDto: UpdateProductDto) {
     return `This action updates a #${id} product`;
   }
 
+
   async remove(id: string) {
-    const product = await this.findOne( id )
+    const product = await this.findOne(id)
 
     await this.productRepository.remove(product);
-    
+
   }
 
 
@@ -77,6 +89,7 @@ export class ProductsService {
     // console.log(error);
     if (error.code === '23505')
       throw new BadRequestException(error.detail);
+
 
 
     this.logger.error(error);

@@ -39,7 +39,10 @@ export class Product {
     @Column('text', {
         array: true
     })
-    sizes: string;
+    sizes: string[];
+    // sizes: string;
+    // sizes: Talla[]
+
 
     @Column('text')
     gender: string
@@ -50,8 +53,10 @@ export class Product {
     @BeforeInsert()
     checkSlugInsert() {
 
-        // //si no existe el slug tomara el titulo q es requerido remplazando espacios por _ y apostrofe por string vacio.
-        // //pero si existiese igual validamos por que seran datos q colocara el usuario.
+     // //si no existe el slug tomara el titulo q es requerido 
+     //remplazando espacios por _ y apostrofe por string vacio.
+     // //pero si existiese igual validamos por que seran datos
+     // q colocara el usuario.
 
         if (!this.slug) {
             this.slug = this.title
@@ -73,4 +78,18 @@ export class Product {
 
     //  @BeforeUpdate
 
+
+    //tags
+    //images
+
 }
+
+
+// export enum Talla {
+//     XS = "EXTRA PEQUEÑA",
+//     S = "PEQUEÑA",
+//     M = "MEDIANA",
+//     L = "GRANDE",
+//     XL = "EXTRA GRANDE",
+//     XXL = "EXTRA EXTRA GRANDE",
+// }
