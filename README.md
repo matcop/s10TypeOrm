@@ -35,4 +35,12 @@
 
         </p>
 
+  7. Si al verificar la Base de Datos, esta se encuentra vacia, puede ejecutar el Seed con el metodo GET desde postman. 
+        <p align="center">
+      
+        ```
+        localhost:3000/api/seed
+        ```
 
+        </p>
+        Asi se podra poblar la base de datos y no empezar sin datos.
