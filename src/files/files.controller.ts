@@ -1,11 +1,31 @@
+
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
+import { FilesService } from './files.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Query, Res, BadRequestException } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { fileFilter } from './helpers/fileFilter.helper';
 
 
+
 @Controller('files')
 export class FilesController {
+
+  constructor(private readonly filesService: FilesService) {}
+
+
+  @Post('product')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadProductImage(
+    @UploadedFile() file:Express.Multer.File  
+  ){
+    return file
+  }
+
+  
+=======
   constructor(private readonly filesService: FilesService) { }
 
   @Post('productos')
@@ -26,6 +46,7 @@ export class FilesController {
 
 
  
+
 
 
 }
