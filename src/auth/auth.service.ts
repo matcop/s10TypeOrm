@@ -9,6 +9,7 @@ import { LoginUserDto, CreateUserDto } from './dto';
 import { emit } from 'process';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly jwtService:JwtService
+    private readonly jwtService: JwtService
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -36,13 +37,16 @@ export class AuthService {
 
 
       await this.userRepository.save(user)
-      // delete user.password;
+      delete user.password;
+      delete user.isActive;
       // delete user.id;
 
 
       return {
         ...user,
-        token:this.getJwtToken({email: user.email})
+        // token: this.getJwtToken({id:user.id, email: user.email })
+        token: this.getJwtToken({ id: user.id })
+
       }
 
 
@@ -73,33 +77,89 @@ export class AuthService {
 
 
 
-
+  //---------LOGIN------------------
   async login(loginUserDto: LoginUserDto) {
     const { password, email } = loginUserDto;
 
+    //  const user2 = await this.userRepository.findOneBy({email});  
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true }
+      select: { email: true, password: true, id: true }
     });
+
+
 
     if (!user)
       throw new UnauthorizedException('Credenciales no son validas (email)');
 
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credenciales no son validas (password)');
+
+
+
+
     // console.log(length(user));
+    const mail_parcial = this.hideEmail(user.email);
     // delete user.id
+
+    //return user;
+   // console.log({ user });
+
     return {
       ...user,
-      token:this.getJwtToken({email: user.email})
+      token: this.getJwtToken({ id: user.id }),
+      "email-parcial": mail_parcial
+    };
+
+    // si las credenciales son correctas, se envia eltoken 
+    // ademas se le enviaria un msg al correo electronico, con un numero generado  4 numeros como si fuese un otp.
+    // se abriria otra pantalla otp_screen para el numero generado
+
+
+
+  }
+
+  //  private hideEmail(email: string): string {
+  //     const parts = email.split('@');
+  //     const hiddenPart = parts[0].slice(1, -1).replace(/./g, '*');
+  //     return `${parts[0][0]}${hiddenPart}@${parts[1]}`;
+  //   }
+
+  // private hideEmail(email: string): string {
+  //   const parts = email.split('@');
+  //   const domain = parts[1];
+
+  //   if (commonDomains.includes(domain)) {
+  //     // Ocultar parte del nombre de usuario para dominios comunes
+  //     const hiddenPart = parts[0].slice(1, -1).replace(/./g, '*');
+  //     return `${parts[0][0]}${hiddenPart}@${parts[1]}`;
+  //   } else {
+  //     // Ocultar solo el primer caracter del nombre de usuario para dominios no comunes
+  //     return `${parts[0][0]}*@${parts[1]}`;
+  //   }
+
+  // }
+
+  hideEmail(email: string): string {
+    const parts = email.split('@');
+    const domain = parts[1];
+
+    if (commonDomains.includes(domain)) {
+      // Ocultar parte del nombre de usuario para dominios comunes
+      const hiddenPart = parts[0].slice(1, -1).replace(/./g, '*');
+      return `${parts[0][0]}${hiddenPart}@${domain.charAt(0)}${domain.slice(-1)}`;
+    } else {
+      // Ocultar solo el primer caracter del nombre de usuario para dominios no comunes
+      return `${parts[0][0]}*@${parts[1]}`;
     }
   }
 
 
-private getJwtToken(payload:JwtPayload){
-  const token = this.jwtService.sign(payload);
-  return token;
-}
+
+  private getJwtToken(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
+  }
 
 
   private handleDBError(error: any): never { // no devuelve ningun valor
@@ -113,3 +173,16 @@ private getJwtToken(payload:JwtPayload){
 
 
 }
+
+const commonDomains = [
+  'gmail.com',
+  'hotmail.com',
+  'yahoo.com',
+  'outlook.com',
+  'icloud.com',
+  'aol.com',
+  'zoho.com',
+  'yandex.com',
+  'protonmail.com',
+  'dot.com',
+];

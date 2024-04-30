@@ -16,26 +16,29 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
 
-        configService:ConfigService
+        configService: ConfigService
     ) {
         super({
-            secretOrKey:configService.get('JWT_SECRET'),
-           jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken(), 
+            secretOrKey: configService.get('JWT_SECRET'),
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         });
     }
 
     async validate(payload: JwtPayload): Promise<User> {
+        //este metodo se encargara de validar si el JWt no ha expirado.
+        //ademas validara si la firma del jwt coincide con el payload. 
+        //ademas ejecutaresmos esto cuando pasen las anteriores 2 validaciones. 
 
-        const { email } = payload;
-        const user = await this.userRepository.findOneBy({ email });
+        const { id } = payload;
+        const user = await this.userRepository.findOneBy({ id });
 
-        if(!user)
-            throw new UnauthorizedException('token not valid...2024 kat...')
+        if (!user)
+            throw new UnauthorizedException('token not valid...2024 kat... autenticacion no valida')
 
-        if(!user.isActive)
-            throw new UnauthorizedException('user is inactive, talk with an admin')
+        if (!user.isActive)
+            throw new UnauthorizedException('user is inactive, talk with an admin - llame al 79537750')
 
-
+        // console.log({ user });
 
 
         return user;
