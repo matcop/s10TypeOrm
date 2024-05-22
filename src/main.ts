@@ -19,12 +19,12 @@ async function bootstrap() {
 
 
   const config = new DocumentBuilder()
-  .setTitle('Teslo RESTUL API')
+  .setTitle('Teslo REST API')
   .setDescription('Teslo shop endpoints')
   .setVersion('1.0')
   .build();
 const document = SwaggerModule.createDocument(app, config);
-SwaggerModule.setup('documentacion', app, document);
+SwaggerModule.setup('api', app, document);
 
 
 
