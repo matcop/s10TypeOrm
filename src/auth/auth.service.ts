@@ -7,7 +7,9 @@ import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt'; //importamos todo de bcrypt
 import { LoginUserDto, CreateUserDto } from './dto';
 import { emit } from 'process';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+//import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { JwtPayload } from './interfaces/index';
+
 import { JwtService } from '@nestjs/jwt';
 import { use } from 'passport';
 
@@ -103,7 +105,7 @@ export class AuthService {
     // delete user.id
 
     //return user;
-   // console.log({ user });
+    // console.log({ user });
 
     return {
       ...user,
@@ -140,6 +142,10 @@ export class AuthService {
 
   // }
 
+
+
+
+
   hideEmail(email: string): string {
     const parts = email.split('@');
     const domain = parts[1];
@@ -154,6 +160,13 @@ export class AuthService {
     }
   }
 
+
+  async checkAuthStatus(user: User) {
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id })
+    };
+  }
 
 
   private getJwtToken(payload: JwtPayload) {

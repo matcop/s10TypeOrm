@@ -18,23 +18,23 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
     JwtModule.registerAsync({
-      imports:[ConfigModule],
-      inject:[ConfigService],
-      useFactory:(configService:ConfigService)=>{
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
         //aqui podria validarse si el valor de JWT EXISTE o no o usar un valor por defecto
         // console.log('jwt config service',configService.get('JWT_SECRET'));
         // console.log('jwt secreto', process.env.JWT_SECRET);
         return {
           secret: configService.get('JWT_SECRET'),
-            signOptions: {
-              expiresIn: '2h'
-            } 
+          signOptions: {
+            expiresIn: '2h'
+          }
         }
       }
     })
   ],
 
-  exports: [TypeOrmModule, JwtStrategy,PassportModule,JwtModule]
+  exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule,]
 
 })
 export class AuthModule { }

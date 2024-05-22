@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
@@ -26,7 +27,7 @@ export class ProductsService {
 
   ) { }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, user:User) {
 
     try {
 
@@ -35,6 +36,7 @@ export class ProductsService {
       // //pero si existiese igual validamos por que seran datos q colocara el usuario. el codigo lo usamos en product.entity
       const product = this.productRepository.create({
         ...productDetails,
+        user:user,
         images: images.map(image => this.productImageRepository.create({ url: image }))
       }); //1.creamos en memoria
 
@@ -47,6 +49,7 @@ export class ProductsService {
       this.handleDBExeptions(error);
     }
   }
+  
   //TODO:PAGINAR
   async findAll(paginationDto: PaginationDto) {
     const { limit = 10, offset = 0 } = paginationDto;
@@ -111,10 +114,10 @@ export class ProductsService {
   }
 
 
-  //Para actualizar 
+  // Para actualizar 
   // entonces buscara un producto on id , y cargaremos los datos opcionales que enviamos a travez del endpoint
   //entonces la linea de abajo solo prepara el registro a actualizar.
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, user:User) {
 
     const { images, ...toUpdate } = updateProductDto;
     const product = await this.productRepository.preload({ id, ...toUpdate });
@@ -146,6 +149,7 @@ export class ProductsService {
       // }
 
       //2da. transaccion
+      product.user=user;
       await queryRunner.manager.save(product);
       await queryRunner.commitTransaction();
       await queryRunner.release();
